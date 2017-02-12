@@ -47,7 +47,7 @@ public class ExpressionCalculator {
         while(index < line.length()){
             Character a = line.charAt(index);
 
-            if(Character.isDigit(a) && index != line.length()-1){
+            if(Character.isDigit(a) || a.equals('.') && index != line.length()-1){
                 tmpDigitString = tmpDigitString + Character.toString(a);
             }
             else if (Character.isDigit(a) && index == line.length()-1){
@@ -85,7 +85,7 @@ public class ExpressionCalculator {
 
         while(index < line.size()){
             String sign = line.get(index);
-            if(Character.isDigit(sign.charAt(0)) && Integer.parseInt(sign) > 0)
+            if(Character.isDigit(sign.charAt(0)) && Double.parseDouble(sign) > 0.0)
                 charQueue.add(sign);
 
             else if(sign.equals("(")){

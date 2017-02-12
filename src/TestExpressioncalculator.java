@@ -8,7 +8,7 @@ public class TestExpressioncalculator {
     public static void main(String[] args) {
 
         ExpressionCalculator calculator = new ExpressionCalculator();
-        String rowLine = "(2+1)*3-4*(7+4)";
+        String rowLine = "(2+1.0)*3.0-4.0*(7+4)";
         Double result = calculator.calculateExperssion(rowLine);
         System.out.println(result);
 
