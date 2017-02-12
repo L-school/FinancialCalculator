@@ -11,6 +11,7 @@ public class TestExpressioncalculator {
         String rowLine = "(2+1)*3-4*(7+4)";
         Double result = calculator.calculateExperssion(rowLine);
         System.out.println(result);
+        System.out.println("test");
 
     }
 
