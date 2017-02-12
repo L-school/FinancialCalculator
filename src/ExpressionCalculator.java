@@ -8,6 +8,13 @@ import java.util.List;
 
 public class ExpressionCalculator {
 
+    public static List<String> currencyList = new ArrayList<>();
+
+    ExpressionCalculator(){
+        currencyList.add("$");
+        currencyList.add("eur");
+    }
+
     public Double calculateExperssion(String rowLine) {
 
         List<String> onrList = fromIndexToOnr(rowLine);
@@ -44,18 +51,41 @@ public class ExpressionCalculator {
 
         int index = 0;
         String tmpDigitString = "";
+        String tmpAlphabeticString = "";
         while(index < line.length()){
             Character a = line.charAt(index);
 
             if(Character.isDigit(a) || a.equals('.') && index != line.length()-1){
                 tmpDigitString = tmpDigitString + Character.toString(a);
+                if(!tmpAlphabeticString.isEmpty()){
+                    inputArray.add(tmpAlphabeticString);
+                    tmpAlphabeticString = "";
+                }
             }
             else if (Character.isDigit(a) && index == line.length()-1){
-                inputArray.add(a.toString());
+                tmpDigitString = tmpDigitString + Character.toString(a);
+                inputArray.add(tmpDigitString);
+            }
+
+            else if (Character.isAlphabetic(a)) {
+                tmpAlphabeticString = tmpAlphabeticString + a;
+                if(!tmpDigitString.isEmpty()) {
+                    inputArray.add(tmpDigitString);
+                    tmpDigitString = "";
+                }
+                if(Character.isAlphabetic(a) && index == line.length()-1){
+                    inputArray.add(tmpAlphabeticString);
+                }
+
+
             }
             else{
                 if(!tmpDigitString.isEmpty()) {
                     inputArray.add(tmpDigitString);
+                }
+                if(!tmpAlphabeticString.isEmpty()){
+                    inputArray.add(tmpAlphabeticString);
+                    tmpAlphabeticString = "";
                 }
                 inputArray.add(a.toString());
                 tmpDigitString = "";
@@ -66,9 +96,38 @@ public class ExpressionCalculator {
     }
 
 
+    private Boolean isCurrencyUnified(List<String> initList){
+
+        String usedCurrency = "";
+        for(String symbol : initList){
+            if(currencyList.contains(symbol)){
+                if(!usedCurrency.isEmpty() && !symbol.equals(usedCurrency)){
+                    throw new IllegalArgumentException("Currency mismatch");
+                } else usedCurrency = symbol;
+            }
+        }
+        return true;
+    }
+
+
+    private List<String> getRidOfCurrencyNotation(List<String> rawList){
+
+        List<String> newList = new ArrayList<>();
+        for(String s : rawList){
+            if(!currencyList.contains(s)){
+                newList.add(s);
+            }
+        }
+        return newList;
+    }
+
     private List<String> fromIndexToOnr(String rowLine){
 
-        List<String> line = parseLineIntoStringArray(rowLine);
+        List<String> parsedLine = parseLineIntoStringArray(rowLine);
+        isCurrencyUnified(parsedLine); //WTH?
+        List<String> line = getRidOfCurrencyNotation(parsedLine);
+
+
         HashMap<String, Integer> symbolMap = new HashMap<>();
         symbolMap.put("(", 0);
         symbolMap.put("+", 1);
