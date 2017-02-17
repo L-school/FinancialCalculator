@@ -1,6 +1,7 @@
 /**
  * Created by lpason on 2017-02-11.
  */
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +11,7 @@ public class ExpressionCalculator {
 
     public static List<String> currencyList = new ArrayList<>();
 
-    ExpressionCalculator(){
+    ExpressionCalculator() {
         currencyList.add("$");
         currencyList.add("eur");
     }
@@ -21,21 +22,32 @@ public class ExpressionCalculator {
         Stock onrStock = new Stock(onrList.size());
 
         for (String e : onrList) {
-            if(Character.isDigit(e.charAt(0))){
+            if (Character.isDigit(e.charAt(0))) {
                 onrStock.push(e);
-            }
-            else if(!Character.isDigit(e.charAt(0))){
+            } else if (!Character.isDigit(e.charAt(0))) {
                 Double a = Double.parseDouble(onrStock.pop());
                 Double b = Double.parseDouble(onrStock.pop());
                 Double c = 0.0;
 
-                switch(e.charAt(0)){
-                    case '+': c = b + a; break;
-                    case '-': c = b - a; break;
-                    case '*': c = b * a; break;
-                    case '/': c = b / a; break;
-                    case '%': c = b % a; break;
-                    case '^': c = Math.pow(a,b); break;
+                switch (e.charAt(0)) {
+                    case '+':
+                        c = b + a;
+                        break;
+                    case '-':
+                        c = b - a;
+                        break;
+                    case '*':
+                        c = b * a;
+                        break;
+                    case '/':
+                        c = b / a;
+                        break;
+                    case '%':
+                        c = b % a;
+                        break;
+                    case '^':
+                        c = Math.pow(a, b);
+                        break;
                 }
                 onrStock.push(c.toString());
             }
@@ -43,47 +55,43 @@ public class ExpressionCalculator {
         return Double.parseDouble(onrStock.peek());
     }
 
-    private List parseLineIntoStringArray(String rowLine){
+    private List parseLineIntoStringArray(String rowLine) {
 
-        String line = rowLine.replaceAll("\\s+","");
+        String line = rowLine.replaceAll("\\s+", "");
 
         List<String> inputArray = new ArrayList<>();
 
         int index = 0;
         String tmpDigitString = "";
         String tmpAlphabeticString = "";
-        while(index < line.length()){
+        while (index < line.length()) {
             Character a = line.charAt(index);
 
-            if(Character.isDigit(a) || a.equals('.') && index != line.length()-1){
+            // forgot about brackets for (Character.isDigit(a) || a.equals('.'))
+            if ((Character.isDigit(a) || a.equals('.')) && index != line.length() - 1) {
                 tmpDigitString = tmpDigitString + Character.toString(a);
-                if(!tmpAlphabeticString.isEmpty()){
+                if (!tmpAlphabeticString.isEmpty()) {
                     inputArray.add(tmpAlphabeticString);
                     tmpAlphabeticString = "";
                 }
-            }
-            else if (Character.isDigit(a) && index == line.length()-1){
+            } else if (Character.isDigit(a) && index == line.length() - 1) {
                 tmpDigitString = tmpDigitString + Character.toString(a);
                 inputArray.add(tmpDigitString);
-            }
-
-            else if (Character.isAlphabetic(a)) {
+            } else if (Character.isAlphabetic(a)) {
                 tmpAlphabeticString = tmpAlphabeticString + a;
-                if(!tmpDigitString.isEmpty()) {
+                if (!tmpDigitString.isEmpty()) {
                     inputArray.add(tmpDigitString);
                     tmpDigitString = "";
                 }
-                if(Character.isAlphabetic(a) && index == line.length()-1){
+                // do we need an extra check here - isAlphabetic. We are in else if already
+                if (Character.isAlphabetic(a) && index == line.length() - 1) {
                     inputArray.add(tmpAlphabeticString);
                 }
-
-
-            }
-            else{
-                if(!tmpDigitString.isEmpty()) {
+            } else {
+                if (!tmpDigitString.isEmpty()) {
                     inputArray.add(tmpDigitString);
                 }
-                if(!tmpAlphabeticString.isEmpty()){
+                if (!tmpAlphabeticString.isEmpty()) {
                     inputArray.add(tmpAlphabeticString);
                     tmpAlphabeticString = "";
                 }
@@ -96,38 +104,42 @@ public class ExpressionCalculator {
     }
 
 
-    private Boolean isCurrencyUnified(List<String> initList){
+    // I did not get the purpose of this method at all
+    private Boolean isCurrencyUnified(List<String> initList) {
 
         String usedCurrency = "";
-        for(String symbol : initList){
-            if(currencyList.contains(symbol)){
-                if(!usedCurrency.isEmpty() && !symbol.equals(usedCurrency)){
+        for (String symbol : initList) {
+            if (currencyList.contains(symbol)) {
+                if (!usedCurrency.isEmpty() && !symbol.equals(usedCurrency)) {
                     throw new IllegalArgumentException("Currency mismatch");
-                } else usedCurrency = symbol;
+                } else {
+                    usedCurrency = symbol;
+                }
             }
         }
         return true;
     }
 
 
-    private List<String> getRidOfCurrencyNotation(List<String> rawList){
+    private List<String> getRidOfCurrencyNotation(List<String> rawList) {
 
         List<String> newList = new ArrayList<>();
-        for(String s : rawList){
-            if(!currencyList.contains(s)){
+        for (String s : rawList) {
+            if (!currencyList.contains(s)) {
                 newList.add(s);
             }
         }
         return newList;
     }
 
-    private List<String> fromIndexToOnr(String rowLine){
+    private List<String> fromIndexToOnr(String rowLine) {
 
         List<String> parsedLine = parseLineIntoStringArray(rowLine);
-        isCurrencyUnified(parsedLine); //WTH?
-        List<String> line = getRidOfCurrencyNotation(parsedLine);
+//        isCurrencyUnified(parsedLine); //WTH?
+        List<String> line = getRidOfCurrencyNotation(parsedLine);// Why do you need it?
 
 
+        // Why this map is here?
         HashMap<String, Integer> symbolMap = new HashMap<>();
         symbolMap.put("(", 0);
         symbolMap.put("+", 1);
@@ -140,46 +152,42 @@ public class ExpressionCalculator {
 
         int index = 0;
         List<String> charQueue = new ArrayList<>();
+        // Can use standard java util classed which support Queue interface
         Stock stock = new Stock(line.size());
 
-        while(index < line.size()){
+        while (index < line.size()) {
             String sign = line.get(index);
-            if(Character.isDigit(sign.charAt(0)) && Double.parseDouble(sign) > 0.0)
+            if (Character.isDigit(sign.charAt(0)) && Double.parseDouble(sign) > 0.0) {
                 charQueue.add(sign);
-
-            else if(sign.equals("(")){
+            } else if (sign.equals("(")) {
                 stock.push(sign);
-            }
-            else if(sign.equals(")")){
-                while(!stock.isEmpty() && !stock.peek().equals("(")) {
+            } else if (sign.equals(")")) {
+                while (!stock.isEmpty() && !stock.peek().equals("(")) {
                     if (!stock.peek().equals("(")) {
                         charQueue.add(stock.pop());
                     }
                 }
                 stock.pop();
-            }
-            else if(symbolMap.containsKey(sign)){
+            } else if (symbolMap.containsKey(sign)) {
 
-                if(stock.isEmpty() == true || (symbolMap.get(sign)) > symbolMap.get(stock.peek()))
+                if (stock.isEmpty() || (symbolMap.get(sign)) > symbolMap.get(stock.peek()))
                     stock.push(sign);
                 else {
-                    while(stock.isEmpty() == false && symbolMap.get(sign) <= symbolMap.get(stock.peek())){
+                    while (!stock.isEmpty() && symbolMap.get(sign) <= symbolMap.get(stock.peek())) {
                         charQueue.add(stock.pop());
                     }
                     stock.push(sign);
                 }
-            }
-            else if(!Character.isDigit(sign.charAt(0)) && !symbolMap.containsKey(sign)) {
+            } else if (!Character.isDigit(sign.charAt(0)) && !symbolMap.containsKey(sign)) {
                 System.out.println("expression contains incorrect sign: " + sign);
             }
             index++;
         }
 
-        while(!stock.isEmpty()){
-            if((stock.peek() != "(" && stock.peek() != ")")) {
+        while (!stock.isEmpty()) {
+            if ((stock.peek() != "(" && stock.peek() != ")")) {
                 charQueue.add(stock.pop());
-            }
-            else
+            } else
                 stock.pop();
         }
         return charQueue;

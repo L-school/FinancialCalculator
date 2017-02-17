@@ -2,13 +2,11 @@
  * Created by lpason on 2017-02-11.
  */
 public class Stock {
-    private int maxSize;
     private String[] stackArray;
     private int top;
 
     public Stock(int s) {
-        maxSize = s;
-        stackArray = new String[maxSize];
+        stackArray = new String[s];
         top = -1;
     }
     public void push(String j) {
@@ -24,7 +22,7 @@ public class Stock {
         return (top == -1);
     }
     public boolean isFull() {
-        return (top == maxSize - 1);
+        return (top == stackArray.length - 1);
     }
 
 }
